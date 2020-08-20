@@ -1,10 +1,15 @@
 import Box from "@material-ui/core/Box";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
+import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import TrendingUp from "@material-ui/icons/TrendingUp";
+import DonutLarge from "@material-ui/icons/DonutLarge";
+import List from "@material-ui/icons/List";
+import PlaylistAddCheck from "@material-ui/icons/PlaylistAddCheck";
 import React, { useEffect, useState } from "react";
 
 import { findInstance, ResultData, findResult } from "../models/bucket";
@@ -17,7 +22,7 @@ import { formatTime, formatTx } from "../utilities/format";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(3, 4),
   },
   batch: {
     marginRight: theme.spacing(2),
@@ -27,15 +32,24 @@ const useStyles = makeStyles((theme) => ({
   },
   icon: {
     display: "inline-block",
-    marginLeft: theme.spacing(2),
+    marginLeft: theme.spacing(1),
     marginTop: theme.spacing(-2),
     marginBottom: theme.spacing(-2),
   },
-  timer: {
+  hidden: {
+    visibility: "hidden",
+  },
+  right: {
+    textAlign: "right",
+  },
+  timerContainer: {
     position: "relative",
+  },
+  timer: {
+    position: "absolute",
     display: "inline-flex",
-    float: "right",
-    marginTop: theme.spacing(-1),
+    right: 0,
+    top: theme.spacing(-1) + 2,
   },
 }));
 
@@ -47,13 +61,25 @@ export interface BatchProps {
   }[];
 }
 
+const LINK_UPDATE_INTERVAL = 5000;
+
 function Batch({ batch, solutions }: BatchSolutions) {
   const classes = useStyles();
   const [link, setLink] = useState(undefined as string | undefined);
   const [solver, setSolver] = useState(undefined as ResultData | undefined);
 
   useEffect(() => {
-    findInstance(batch).then(setLink);
+    const updateLink = async () => {
+      const link = await findInstance(batch);
+      if (link) {
+        setLink(link);
+        clearInterval(timer);
+      }
+    };
+
+    const timer = setInterval(updateLink, LINK_UPDATE_INTERVAL);
+    updateLink();
+    return () => clearInterval(timer);
   }, [batch, solutions]);
 
   const solverAddress = (solutions || [])[0]?.solver;
@@ -65,46 +91,79 @@ function Batch({ batch, solutions }: BatchSolutions) {
 
   return (
     <Paper className={classes.root}>
-      {link === undefined ? (
-        <span className={classes.batch}>Batch #{batch}:</span>
-      ) : (
-        <a className={classes.batch} href={link}>
-          Batch #{batch}:
-        </a>
-      )}
-      <span className={classes.tx}>
-        {solutions === undefined ? (
-          <span>Awaiting solutions...</span>
-        ) : solutions.length === 0 ? (
-          <span>No Solution</span>
-        ) : (
-          <a href={`https://etherscan.io/tx/${solutions![0].txHash}`}>
-            {formatTx(solutions![0].txHash)}
-          </a>
-        )}
-      </span>
-      {solver ? (
-        <span>
-          <a href={solver.result}>{solver.solver}</a>
-          <a className={classes.icon} href={solver.graph}>
-            <IconButton
-              color="primary"
-              aria-label="upload picture"
-              component="span"
-            >
-              <TrendingUp />
-            </IconButton>
-          </a>
-        </span>
-      ) : solutions && solutions.length > 0 ? (
-        <span>Unknown Solver</span>
-      ) : (
-        <span />
-      )}
-      <SolveTimer classes={classes} batch={batch} />
+      <Grid container spacing={1}>
+        <Grid item xs={3}>
+          Batch #{batch}
+        </Grid>
+        <Grid item xs={3}>
+          {solver
+            ? solver.solver
+            : solutions && solutions.length > 0
+            ? "Unknown Solver"
+            : ""}
+        </Grid>
+        <Grid item xs={2}>
+          {solutions === undefined ? (
+            <span>Solving...</span>
+          ) : solutions.length === 0 ? (
+            <span>No Solution</span>
+          ) : (
+            <span>
+              Tx{" "}
+              <a href={`https://etherscan.io/tx/${solutions![0].txHash}`}>
+                {formatTx(solutions![0].txHash)}
+              </a>
+            </span>
+          )}
+        </Grid>
+        <Grid item xs={3} className={classes.right}>
+          <Tooltip title="Instance">
+            <LinkButton classes={classes} href={link} icon={List} />
+          </Tooltip>
+          <Tooltip title="Result">
+            <LinkButton
+              classes={classes}
+              href={solver?.result}
+              icon={PlaylistAddCheck}
+            />
+          </Tooltip>
+          <Tooltip title="Graph">
+            <LinkButton
+              classes={classes}
+              href={solver?.graph}
+              icon={DonutLarge}
+            />
+          </Tooltip>
+        </Grid>
+        <Grid item xs={1} className={classes.timerContainer}>
+          <SolveTimer classes={classes} batch={batch} />
+        </Grid>
+      </Grid>
     </Paper>
   );
 }
+
+const LinkButton = React.forwardRef(function LinkButton(
+  {
+    href,
+    classes,
+    icon,
+  }: {
+    href: string | undefined;
+    classes: ReturnType<typeof useStyles>;
+    icon: any;
+  },
+  ref: any,
+) {
+  const Icon = icon;
+  return (
+    <Link className={classes.icon} href={href} ref={ref}>
+      <IconButton className={href ? undefined : classes.hidden} color="primary">
+        <Icon />
+      </IconButton>
+    </Link>
+  );
+});
 
 const TIMER_UPDATE_INTERVAL = 250;
 
@@ -145,7 +204,7 @@ function SolveTimer({
   }, [batch]);
 
   if (!remaining) {
-    return <span />;
+    return <Box width={40} />;
   }
   return (
     <Box className={classes.timer}>
