@@ -1,11 +1,13 @@
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+import TrendingUp from '@material-ui/icons/TrendingUp';
 import React, { useEffect, useState } from 'react';
 
-import { findInstance } from '../models/bucket';
+import { findInstance, ResultData, findResult } from '../models/bucket';
 import { solveTimeRemaining, BATCH_DURATION, BatchSolutions } from '../models/exchange';
 import { formatTime, formatTx } from '../utilities/format';
 
@@ -14,8 +16,17 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   batch: {
-    marginRight: theme.spacing(1),
-  }
+    marginRight: theme.spacing(2),
+  },
+  tx: {
+    marginRight: theme.spacing(2),
+  },
+  timer: {
+    position: 'relative',
+    display: 'inline-flex',
+    float: 'right',
+    marginTop: theme.spacing(-1),
+  },
 }));
 
 const LINK_UPDATE_INTERVAL = 5000;
@@ -31,7 +42,8 @@ export interface BatchProps {
 function Batch({ batch, solutions }: BatchSolutions) {
   const classes = useStyles();
   const [link, setLink] = useState(undefined as string | undefined);
-  
+  const [solver, setSolver] = useState(undefined as ResultData | undefined);
+
   useEffect(() => {
     const updateLink = async () => {
       const link = await findInstance(batch);
@@ -46,47 +58,65 @@ function Batch({ batch, solutions }: BatchSolutions) {
     return () => clearInterval(timer);
   }, [batch]);
 
+  useEffect(() => {
+    if (solutions && solutions.length > 0) {
+      findResult(batch, solutions[0].solver).then(setSolver)
+    }
+  }, [batch, solutions]);
+
   return (
     <Paper className={classes.root}>
       {link === undefined
         ? <span className={classes.batch}>Batch #{batch}:</span>
         : <a className={classes.batch} href={link}>Batch #{batch}:</a>
       }
-      {solutions === undefined 
-        ? <SolveTimer batch={batch} />
-        : solutions.length === 0 
-        ? <span>No Solution</span>
-        : <a href={`https://etherscan.io/tx/${solutions![0].txHash}`}>{formatTx(solutions![0].txHash)}</a>
+      <span className={classes.tx}>
+        {solutions === undefined
+          ? <span>Awaiting solutions...</span>
+          : solutions.length === 0
+            ? <span>No Solution</span>
+            : <a href={`https://etherscan.io/tx/${solutions![0].txHash}`}>{formatTx(solutions![0].txHash)}</a>
+        }
+      </span>
+      {solver
+        ? <span>
+          <a href={solver.result}>{solver.solver}</a>
+          <a href={solver.graph}>
+            <IconButton color="primary" aria-label="upload picture" component="span">
+              <TrendingUp />
+            </IconButton>
+          </a>
+        </span>
+        : solutions && solutions.length > 0
+          ? <span>Unknown Solver</span>
+          : <span />
       }
+      <SolveTimer classes={classes} batch={batch} />
     </Paper>
   );
 }
 
 const TIMER_UPDATE_INTERVAL = 250;
 
-function SolveTimer({ batch }: { batch: number }) {
-  const [state, setState] = useState({} as {
-    remaining?: string,
-    variant?: 'static' | undefined,
-    color?: 'secondary' | undefined,
-    value?: number,
-  });
+function SolveTimer({ batch, classes }: { batch: number, classes: ReturnType<typeof useStyles> }) {
+  const [remaining, setRemaining] = useState(undefined as {
+    batchRemaining: number,
+    final: boolean,
+  } | undefined);
 
   useEffect(() => {
     const timer = setInterval(() => {
       const result = solveTimeRemaining(batch);
       if (result === undefined) {
-        setState({});
+        setRemaining(undefined);
         clearInterval(timer);
         return;
       }
 
       const [remaining, batchRemaining] = result;
-      setState({
-        remaining: formatTime(batchRemaining),
-        variant: 'static',
-        color: remaining > 0 ? undefined : 'secondary',
-        value: 100 * batchRemaining / BATCH_DURATION,
+      setRemaining({
+        batchRemaining,
+        final: remaining === 0,
       });
     }, TIMER_UPDATE_INTERVAL);
     return () => {
@@ -94,12 +124,15 @@ function SolveTimer({ batch }: { batch: number }) {
     };
   }, [batch]);
 
+  if (!remaining) {
+    return <span />;
+  }
   return (
-    <Box position='relative' display='inline-flex'>
+    <Box className={classes.timer}>
       <CircularProgress
-        variant={state.variant}
-        color={state.color}
-        value={state.value}
+        variant='static'
+        color={remaining.final ? 'secondary' : 'primary'}
+        value={100 * remaining.batchRemaining / BATCH_DURATION}
       />
       <Box
         top={0}
@@ -111,7 +144,9 @@ function SolveTimer({ batch }: { batch: number }) {
         alignItems='center'
         justifyContent='center'
       >
-        <Typography variant='caption' component='div' color='textSecondary'>{state.remaining}</Typography>
+        <Typography variant='caption' component='div' color='textSecondary'>
+          {formatTime(remaining.batchRemaining)}
+        </Typography>
       </Box>
     </Box>
   );

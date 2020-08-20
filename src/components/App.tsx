@@ -21,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 const BATCH_UPDATE_INTERVAL = 5000;
 const BATCH_COUNT = 10;
+const BATCH_FILTER_UNSOLVED = window.location.search.search(/solved/) !== -1;
 
 function App() {
   const classes = useStyles();
@@ -28,7 +29,7 @@ function App() {
 
   useEffect(() => {
     const updateBatches = async () => {
-      const batches = await getLatestBatchSolutions(BATCH_COUNT);
+      const batches = await getLatestBatchSolutions(BATCH_COUNT, BATCH_FILTER_UNSOLVED);
       setBatches(batches);
     };
 

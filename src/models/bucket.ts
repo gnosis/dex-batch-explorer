@@ -43,7 +43,7 @@ export interface ResultData {
   graph: string,
 }
 
-export async function findResult(solver: string, batch: number): Promise<ResultData | undefined> {
+export async function findResult(batch: number, solver: string): Promise<ResultData | undefined> {
   const solverData = getSolverByAddress(solver);
   if (!solverData) {
     return undefined;
