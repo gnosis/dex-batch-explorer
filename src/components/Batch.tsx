@@ -21,6 +21,12 @@ const useStyles = makeStyles((theme) => ({
   tx: {
     marginRight: theme.spacing(2),
   },
+  icon: {
+    display: 'inline-block',
+    marginLeft: theme.spacing(2),
+    marginTop: theme.spacing(-2),
+    marginBottom: theme.spacing(-2),
+  },
   timer: {
     position: 'relative',
     display: 'inline-flex',
@@ -81,7 +87,7 @@ function Batch({ batch, solutions }: BatchSolutions) {
       {solver
         ? <span>
           <a href={solver.result}>{solver.solver}</a>
-          <a href={solver.graph}>
+          <a className={classes.icon} href={solver.graph}>
             <IconButton color="primary" aria-label="upload picture" component="span">
               <TrendingUp />
             </IconButton>

@@ -39,7 +39,7 @@ function App() {
   }, []);
 
   return (
-    <Container>
+    <Container fixed>
       <header className={classes.header}>
         <img src={logo} className={classes.logo} alt="logo" />
       </header>
