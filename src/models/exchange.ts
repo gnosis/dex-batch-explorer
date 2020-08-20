@@ -17,7 +17,9 @@ export function batchDate(batch: number): Date {
   return new Date(timestampForBatch(batch) * 1000);
 }
 
-export function solveTimeRemaining(batch: number): [number, number] | undefined {
+export function solveTimeRemaining(
+  batch: number,
+): [number, number] | undefined {
   const now = timestamp();
   const solveStart = timestampForBatch(batch + 1);
   const solveEnd = solveStart + BATCH_DURATION;
@@ -29,7 +31,7 @@ export function solveTimeRemaining(batch: number): [number, number] | undefined 
   return [Math.max(remaining - FINALITY_DURATION, 0), remaining];
 }
 
-const GP_GRAPH = 'https://api.thegraph.com/subgraphs/name/gnosis/protocol';
+const GP_GRAPH = "https://api.thegraph.com/subgraphs/name/gnosis/protocol";
 
 export interface BatchSolutions {
   batch: number;
@@ -44,14 +46,17 @@ export interface Solution {
   reverted: boolean;
 }
 
-export async function getLatestBatchSolutions(count: number, filterUnsolvedBatches: boolean): Promise<BatchSolutions[]> {
+export async function getLatestBatchSolutions(
+  count: number,
+  filterUnsolvedBatches: boolean,
+): Promise<BatchSolutions[]> {
   const solvingBatch = batchForTimestamp(timestamp()) - 1;
   const filter = filterUnsolvedBatches
     ? `first: ${count}`
     : `where: {id_gt: "${solvingBatch - count}"}`;
 
   const response = await fetch(GP_GRAPH, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({
       query: `{
         batches(
@@ -99,27 +104,27 @@ export async function getLatestBatchSolutions(count: number, filterUnsolvedBatch
       objectiveValue: BigInt(solution.objectiveValue),
       txHash: solution.txHash,
       reverted: !!solution.revertEpoch,
-    }))
+    })),
   }));
 
   if (batchData.length === 0 || batchData[0].batch !== solvingBatch) {
-    const [remaining,] = solveTimeRemaining(solvingBatch) || [0, 0];
+    const [remaining] = solveTimeRemaining(solvingBatch) || [0, 0];
     batchData.unshift({
       batch: solvingBatch,
       solutions: remaining === 0 ? [] : undefined,
-    })
+    });
   }
 
   const batches = filterUnsolvedBatches
     ? batchData
-    : [...Array(count).keys()]
-      .map((i) => {
+    : [...Array(count).keys()].map((i) => {
         const batchId = solvingBatch - i;
-        return batchData
-          .find((batch) => batch.batch === batchId) || {
-          batch: batchId,
-          solutions: [],
-        }
+        return (
+          batchData.find((batch) => batch.batch === batchId) || {
+            batch: batchId,
+            solutions: [],
+          }
+        );
       });
 
   return batches.slice(0, count);
