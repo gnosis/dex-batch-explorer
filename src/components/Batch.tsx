@@ -39,8 +39,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const LINK_UPDATE_INTERVAL = 5000;
-
 export interface BatchProps {
   batch: number;
   solutions?: {
@@ -55,24 +53,15 @@ function Batch({ batch, solutions }: BatchSolutions) {
   const [solver, setSolver] = useState(undefined as ResultData | undefined);
 
   useEffect(() => {
-    const updateLink = async () => {
-      const link = await findInstance(batch);
-      if (link) {
-        setLink(link);
-        clearInterval(timer);
-      }
-    };
-
-    const timer = setInterval(updateLink, LINK_UPDATE_INTERVAL);
-    updateLink();
-    return () => clearInterval(timer);
-  }, [batch]);
-
-  useEffect(() => {
-    if (solutions && solutions.length > 0) {
-      findResult(batch, solutions[0].solver).then(setSolver);
-    }
+    findInstance(batch).then(setLink);
   }, [batch, solutions]);
+
+  const solverAddress = (solutions || [])[0]?.solver; 
+  useEffect(() => {
+    if (solverAddress) {
+      findResult(batch, solverAddress).then(setSolver);
+    }
+  }, [batch, solverAddress]);
 
   return (
     <Paper className={classes.root}>
