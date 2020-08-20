@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const BATCH_UPDATE_INTERVAL = 2000;
+const BATCH_UPDATE_INTERVAL = 5000;
 const BATCH_COUNT = 10;
 
 function App() {
@@ -27,12 +27,14 @@ function App() {
   const [batches, setBatches] = useState([] as BatchSolutions[]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      getLatestBatchSolutions(BATCH_COUNT).then(setBatches);
-    }, BATCH_UPDATE_INTERVAL);
-    return () => {
-      clearInterval(timer);
+    const updateBatches = async () => {
+      const batches = await getLatestBatchSolutions(BATCH_COUNT);
+      setBatches(batches);
     };
+
+    const timer = setInterval(updateBatches, BATCH_UPDATE_INTERVAL);
+    updateBatches();
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -44,7 +46,7 @@ function App() {
         ? <CircularProgress />
         : <Grid container spacing={3}>
             {batches.map((batch) => (
-              <Grid item xs={12}>
+              <Grid item xs={12} key={batch.batch}>
                 <Batch {...batch} />
               </Grid>
             ))}

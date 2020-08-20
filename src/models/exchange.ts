@@ -13,9 +13,8 @@ function timestampForBatch(batch: number): number {
     return batch * BATCH_DURATION;
 }
 
-export function batchDate(batch: number): string {
-    const date = new Date(timestampForBatch(batch) * 1000);
-    return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
+export function batchDate(batch: number): Date {
+    return new Date(timestampForBatch(batch) * 1000);
 }
 
 export function solveTimeRemaining(batch: number): [number, number] | undefined {

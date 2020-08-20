@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import { findInstance } from '../models/bucket';
 import { solveTimeRemaining, BATCH_DURATION, BatchSolutions } from '../models/exchange';
+import { formatTime, formatTx } from '../utilities/format';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -16,10 +17,6 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   }
 }));
-
-function formatTx(tx: string): string {
-  return `${tx.substr(0, 6)}...${tx.substr(-4)}`;
-}
 
 const LINK_UPDATE_INTERVAL = 5000;
 
@@ -36,17 +33,17 @@ function Batch({ batch, solutions }: BatchSolutions) {
   const [link, setLink] = useState(undefined as string | undefined);
   
   useEffect(() => {
-    const timer = setInterval(() => {
-      findInstance(batch).then((link) => {
-        if (link) {
-          setLink(link);
-          clearInterval(timer);
-        }
-      })
-    }, LINK_UPDATE_INTERVAL);
-    return () => {
-      clearInterval(timer);
+    const updateLink = async () => {
+      const link = await findInstance(batch);
+      if (link) {
+        setLink(link);
+        clearInterval(timer);
+      }
     };
+
+    const timer = setInterval(updateLink, LINK_UPDATE_INTERVAL);
+    updateLink();
+    return () => clearInterval(timer);
   }, [batch]);
 
   return (
@@ -65,22 +62,13 @@ function Batch({ batch, solutions }: BatchSolutions) {
   );
 }
 
-function zeroPad(value: number, places: number) {
-  var zero = places - value.toString().length + 1;
-  return Array(+(zero > 0 && zero)).join("0") + value;
-}
-
-function formatTime(seconds: number): string {
-  return `${~~(seconds / 60)}:${zeroPad(seconds % 60, 2)}`;
-}
-
 const TIMER_UPDATE_INTERVAL = 250;
 
 function SolveTimer({ batch }: { batch: number }) {
   const [state, setState] = useState({} as {
     remaining?: string,
-    variant?: "static" | undefined,
-    color?: "secondary" | undefined,
+    variant?: 'static' | undefined,
+    color?: 'secondary' | undefined,
     value?: number,
   });
 
@@ -96,8 +84,8 @@ function SolveTimer({ batch }: { batch: number }) {
       const [remaining, batchRemaining] = result;
       setState({
         remaining: formatTime(batchRemaining),
-        variant: "static",
-        color: remaining > 0 ? undefined : "secondary",
+        variant: 'static',
+        color: remaining > 0 ? undefined : 'secondary',
         value: 100 * batchRemaining / BATCH_DURATION,
       });
     }, TIMER_UPDATE_INTERVAL);
@@ -107,7 +95,7 @@ function SolveTimer({ batch }: { batch: number }) {
   }, [batch]);
 
   return (
-    <Box position="relative" display="inline-flex">
+    <Box position='relative' display='inline-flex'>
       <CircularProgress
         variant={state.variant}
         color={state.color}
@@ -118,12 +106,12 @@ function SolveTimer({ batch }: { batch: number }) {
         left={0}
         bottom={0}
         right={0}
-        position="absolute"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
+        position='absolute'
+        display='flex'
+        alignItems='center'
+        justifyContent='center'
       >
-        <Typography variant="caption" component="div" color="textSecondary">{state.remaining}</Typography>
+        <Typography variant='caption' component='div' color='textSecondary'>{state.remaining}</Typography>
       </Box>
     </Box>
   );
