@@ -103,7 +103,7 @@ export async function getLatestBatchSolutions(count: number, filterUnsolvedBatch
   }));
 
   if (batchData.length === 0 || batchData[0].batch !== solvingBatch) {
-    const [remaining,] = solveTimeRemaining(solvingBatch);
+    const [remaining,] = solveTimeRemaining(solvingBatch) || [0, 0];
     batchData.unshift({
       batch: solvingBatch,
       solutions: remaining === 0 ? [] : undefined,
@@ -117,9 +117,9 @@ export async function getLatestBatchSolutions(count: number, filterUnsolvedBatch
         const batchId = solvingBatch - i;
         return batchData
           .find((batch) => batch.batch === batchId) || {
-            batch: batchId,
-            solutions: [],
-          }
+          batch: batchId,
+          solutions: [],
+        }
       });
 
   return batches.slice(0, count);
