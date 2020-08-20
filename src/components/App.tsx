@@ -19,9 +19,9 @@ const useStyles = makeStyles((theme) => ({
   progress: {
     display: "flex",
     width: "100%",
-justifyContent: "center",
-padding: theme.spacing(4),
-boxSizing: "border-box",
+    justifyContent: "center",
+    padding: theme.spacing(4),
+    boxSizing: "border-box",
   },
   settings: {
     float: "right",
@@ -40,7 +40,9 @@ const BATCH_FILTER_UNSOLVED_KEY = "App.filterUnsolved";
 
 function App() {
   const classes = useStyles();
-  const [filterUnsolved, setFilteredUnsolved] = useState(localStorage.getItem(BATCH_FILTER_UNSOLVED_KEY) === "true");
+  const [filterUnsolved, setFilteredUnsolved] = useState(
+    localStorage.getItem(BATCH_FILTER_UNSOLVED_KEY) === "true",
+  );
   const [batches, setBatches] = useState([] as BatchSolutions[]);
 
   const handleFilterCheckbox = (_: unknown, checked: boolean) => {
@@ -57,7 +59,7 @@ function App() {
       );
       setBatches(batches);
     };
-    
+
     const timer = setInterval(updateBatches, BATCH_UPDATE_INTERVAL);
     updateBatches();
     return () => clearInterval(timer);
@@ -68,26 +70,33 @@ function App() {
       <header className={classes.header}>
         <img src={logo} className={classes.logo} alt="logo" />
       </header>
-<FormGroup className={classes.settings}>
+      <FormGroup className={classes.settings}>
         <FormControlLabel
-          control={<Checkbox checked={filterUnsolved} onChange={handleFilterCheckbox} name="filter" color="primary" />}
+          control={
+            <Checkbox
+              checked={filterUnsolved}
+              onChange={handleFilterCheckbox}
+              name="filter"
+              color="primary"
+            />
+          }
           label="Filter unsolved batches"
         />
       </FormGroup>
 
       {batches.length === 0 ? (
         <div className={classes.progress}>
-        <CircularProgress size="8vmin"/>
+          <CircularProgress size="8vmin" />
         </div>
       ) : (
-          <Grid container spacing={3}>
-            {batches.map((batch) => (
-              <Grid item xs={12} key={batch.batch}>
-                <Batch {...batch} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
+        <Grid container spacing={3}>
+          {batches.map((batch) => (
+            <Grid item xs={12} key={batch.batch}>
+              <Batch {...batch} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Container>
   );
 }

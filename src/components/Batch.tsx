@@ -56,7 +56,7 @@ function Batch({ batch, solutions }: BatchSolutions) {
     findInstance(batch).then(setLink);
   }, [batch, solutions]);
 
-  const solverAddress = (solutions || [])[0]?.solver; 
+  const solverAddress = (solutions || [])[0]?.solver;
   useEffect(() => {
     if (solverAddress) {
       findResult(batch, solverAddress).then(setSolver);
