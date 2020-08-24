@@ -22,6 +22,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "bundle": "yarn build && tar -cvzf dex-solutions.tar.gz -C build .",
     "prettier": "prettier ."
   },
   "eslintConfig": {

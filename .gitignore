@@ -10,6 +10,7 @@
 
 # production
 /build
+dex-solutions.tar.gz
 
 # misc
 .DS_Store
