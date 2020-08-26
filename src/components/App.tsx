@@ -8,7 +8,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 
 import logo from "../logo.svg";
-import { getLatestBatchSolutions, BatchSolutions, timeRemainingInCurrentBatch } from "../models/exchange";
+import {
+  getLatestBatchSolutions,
+  BatchSolutions,
+  timeRemainingInCurrentBatch,
+} from "../models/exchange";
 import Batch from "./Batch";
 
 const useStyles = makeStyles((theme) => ({
@@ -46,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   "@media (prefers-reduced-motion: no-preference)": {
     logoSpin: {
       animation: "$logo-spin 1 1s linear",
-    }
+    },
   },
 }));
 
@@ -83,7 +87,8 @@ function App() {
   }, [filterUnsolved]);
 
   useEffect(() => {
-    const scheduleSpin = () => setTimeout(spin, timeRemainingInCurrentBatch() * 1000);
+    const scheduleSpin = () =>
+      setTimeout(spin, timeRemainingInCurrentBatch() * 1000);
     const spin = () => {
       setLogoClasses(`${classes.logo} ${classes.logoSpin}`);
       timer = setTimeout(() => {
