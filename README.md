@@ -1,4 +1,4 @@
-# Gnosis Protocol Batches
+# Gnosis Protocol Batch Explorer
 
 A simple static web page for monitoring Gnosis Protocol batches and providing
 links to batch instances and solutions.
