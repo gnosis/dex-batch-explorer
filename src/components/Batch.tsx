@@ -17,6 +17,7 @@ import {
   solveTimeRemaining,
   BATCH_DURATION,
   BatchSolutions,
+  batchDate,
 } from "../models/exchange";
 import { formatTime, formatTx } from "../utilities/format";
 
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3, 4),
   },
   batch: {
-    marginRight: theme.spacing(2),
+    cursor: "help",
   },
   tx: {
     marginRight: theme.spacing(2),
@@ -38,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
   hidden: {
     visibility: "hidden",
+    cursor: "none",
   },
   right: {
     textAlign: "right",
@@ -93,7 +95,9 @@ function Batch({ batch, solutions }: BatchSolutions) {
     <Paper className={classes.root}>
       <Grid container spacing={1}>
         <Grid item xs={3}>
-          Batch #{batch}
+          <Tooltip title={formatBatchTime(batch)} className={classes.batch}>
+            <span>Batch #{batch}</span>
+          </Tooltip>
         </Grid>
         <Grid item xs={3}>
           {solver
@@ -117,23 +121,15 @@ function Batch({ batch, solutions }: BatchSolutions) {
           )}
         </Grid>
         <Grid item xs={3} className={classes.right}>
-          <Tooltip title="Instance">
-            <LinkButton classes={classes} href={link} icon={List} />
-          </Tooltip>
-          <Tooltip title="Result">
-            <LinkButton
-              classes={classes}
-              href={solver?.result}
-              icon={PlaylistAddCheck}
-            />
-          </Tooltip>
-          <Tooltip title="Graph">
-            <LinkButton
-              classes={classes}
-              href={solver?.graph}
-              icon={DonutLarge}
-            />
-          </Tooltip>
+          <LinkButton title="Instance" classes={classes} href={link}>
+            <List />
+          </LinkButton>
+          <LinkButton title="Result" classes={classes} href={solver?.result}>
+            <PlaylistAddCheck />
+          </LinkButton>
+          <LinkButton title="Graph" classes={classes} href={solver?.graph}>
+            <DonutLarge />
+          </LinkButton>
         </Grid>
         <Grid item xs={1} className={classes.timerContainer}>
           <SolveTimer classes={classes} batch={batch} />
@@ -143,27 +139,34 @@ function Batch({ batch, solutions }: BatchSolutions) {
   );
 }
 
-const LinkButton = React.forwardRef(function LinkButton(
-  {
-    href,
-    classes,
-    icon,
-  }: {
-    href: string | undefined;
-    classes: ReturnType<typeof useStyles>;
-    icon: any;
-  },
-  ref: any,
-) {
-  const Icon = icon;
+function formatBatchTime(batch: number): string {
+  const [start, end] = [batchDate(batch), batchDate(batch + 1)];
+  if (start.getDate() == end.getDate()) {
+    return `${start.toLocaleString()} - ${end.toLocaleTimeString()}`;
+  } else {
+    return `${start.toLocaleString()} - ${end.toLocaleString()}`;
+  }
+}
+
+function LinkButton({
+  title,
+  href,
+  classes,
+  children,
+}: {
+  title: string;
+  href: string | undefined;
+  classes: ReturnType<typeof useStyles>;
+  children: React.ReactElement;
+}) {
   return (
-    <Link className={classes.icon} href={href} ref={ref}>
-      <IconButton className={href ? undefined : classes.hidden} color="primary">
-        <Icon />
-      </IconButton>
-    </Link>
+    <Tooltip className={href ? undefined : classes.hidden} title={title}>
+      <Link className={classes.icon} href={href}>
+        <IconButton color="primary">{children}</IconButton>
+      </Link>
+    </Tooltip>
   );
-});
+}
 
 const TIMER_UPDATE_INTERVAL = 250;
 

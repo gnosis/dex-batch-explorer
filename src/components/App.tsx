@@ -29,7 +29,8 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     height: "20vmin",
-    paddingRight: "3vmin",
+    // NOTE: Logo isn't centered on owl, so account for that.
+    translate: "-6%",
     pointerEvents: "none",
   },
 }));

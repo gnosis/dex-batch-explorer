@@ -5,9 +5,13 @@ import App from "./components/App";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  // TODO(nlordell): `@material-ui/core/Tooltip` causes strict-mode warnings so
+  // disable for now. This should be fixed with `@material-ui/core@5.x`, so
+  // re-enable when it is released.
+  // <React.StrictMode>
+  //   <App />
+  // </React.StrictMode>,
+  <App />,
   document.getElementById("root"),
 );
 
