@@ -12,6 +12,7 @@ deploy:
   file: dex-solutions.tar.gz
   tag_name: latest
   name: master
+  prerelease: true
   on:
     repo: gnosis/dex-solutions
     branch: master
