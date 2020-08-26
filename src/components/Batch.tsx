@@ -141,7 +141,7 @@ function Batch({ batch, solutions }: BatchSolutions) {
 
 function formatBatchTime(batch: number): string {
   const [start, end] = [batchDate(batch), batchDate(batch + 1)];
-  if (start.getDate() == end.getDate()) {
+  if (start.getDate() === end.getDate()) {
     return `${start.toLocaleString()} - ${end.toLocaleTimeString()}`;
   } else {
     return `${start.toLocaleString()} - ${end.toLocaleString()}`;
