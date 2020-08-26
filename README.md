@@ -17,6 +17,6 @@ page with NGINX on port 80:
 ```
 $ docker build -t dex-batch-explorer -f docker/Dockerfile .
 ...
-$ docker run -p 80:80 dex-batch-explorer
+$ docker run -d -p 80:80 dex-batch-explorer
 $ xdg-open http://localhost:80/
 ```
