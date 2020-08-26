@@ -10,5 +10,7 @@ deploy:
   api_key:
     secure: I+4KKVAJ6Vgot8eiemTdpb6QGHZEqgi68iYBLGfHx2aYbh8Le/VdPZdrCu3bx3FUNhPuohqFa8sDZXYgp5uXSHZLmF8vGnx8B2EbFEpghiznGbKoJlZeIioCY16uJSTHK4isX1lX7dxXKqpsmpHThQbIY8R013Ja8bmiw7XieconDhPs36s9YG1b3YLe8vL3LgdYWEwx4ArIgR49nskNT879VIsCqdW7hRK63w+zYnSey+f5FMTTc5YwaQeZ6gVFoFvKD1DryztKPzISw78j3apX+yBOXA/Ir9+a9IxqVZ9Mj1XhUTfPDym7AKHb+6XAyV3TTex5ZHfnEm7TRlxWOkmMWGlc08+JIxcoVoBXKz8x4NNZ8ONwtEXg9qH95lVDl5K2Bije9ni4Z0uN023dksnAz9SxYeMgZmQSQfOARiewtKM5qwYHtRI73G0ODpK+zF1to1SVi5Q/Cenww6xsqEkP6F1Yj/ze+CboPaEXFkPHdjPwma0OT0TWh6J3TOTa7rh6XdOjP2U+SXXSKswEH5WYxwx59rPrCUPgS6bIBusad07/KMeNckolnj2IokGbsY/INWmb1rz5R12X3tqeY4f4VFG/VGw61h01zlbiCsBeFfjjcQrX+QjEaqN4AOa0kWBbvDzvZ+++oGFllkNB9hBTJg2fVEY8FtLGdtE2wz8=
   file: dex-solutions.tar.gz
+  tag_name: latest
+  name: master
   on:
     repo: gnosis/dex-solutions

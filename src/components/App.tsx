@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 
 import logo from "../logo.svg";
-import { getLatestBatchSolutions, BatchSolutions } from "../models/exchange";
+import { getLatestBatchSolutions, BatchSolutions, timeRemainingInCurrentBatch } from "../models/exchange";
 import Batch from "./Batch";
 
 const useStyles = makeStyles((theme) => ({
@@ -30,8 +30,23 @@ const useStyles = makeStyles((theme) => ({
   logo: {
     height: "20vmin",
     // NOTE: Logo isn't centered on owl, so account for that.
-    translate: "-6%",
+    translate: "-6.8%",
+    transformOrigin: "56.8% 40.8%",
     pointerEvents: "none",
+  },
+  "@keyframes logo-spin": {
+    from: {
+      transform: "rotate(0deg)",
+    },
+    to: {
+      transform: "rotate(360deg)",
+    },
+  },
+  logoSpin: {},
+  "@media (prefers-reduced-motion: no-preference)": {
+    logoSpin: {
+      animation: "$logo-spin 1 1s linear",
+    }
   },
 }));
 
@@ -45,6 +60,7 @@ function App() {
     localStorage.getItem(BATCH_FILTER_UNSOLVED_KEY) === "true",
   );
   const [batches, setBatches] = useState([] as BatchSolutions[]);
+  const [logoClasses, setLogoClasses] = useState(classes.logo);
 
   const handleFilterCheckbox = (_: unknown, checked: boolean) => {
     localStorage.setItem(BATCH_FILTER_UNSOLVED_KEY, checked.toString());
@@ -66,10 +82,24 @@ function App() {
     return () => clearInterval(timer);
   }, [filterUnsolved]);
 
+  useEffect(() => {
+    const scheduleSpin = () => setTimeout(spin, timeRemainingInCurrentBatch() * 1000);
+    const spin = () => {
+      setLogoClasses(`${classes.logo} ${classes.logoSpin}`);
+      timer = setTimeout(() => {
+        setLogoClasses(classes.logo);
+        timer = scheduleSpin();
+      }, 10000);
+    };
+
+    let timer = scheduleSpin();
+    return () => clearTimeout(timer);
+  }, [classes.logo, classes.logoSpin]);
+
   return (
     <Container fixed>
       <header className={classes.header}>
-        <img src={logo} className={classes.logo} alt="logo" />
+        <img src={logo} className={logoClasses} alt="logo" />
       </header>
       <FormGroup className={classes.settings}>
         <FormControlLabel

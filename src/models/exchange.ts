@@ -9,12 +9,22 @@ function batchForTimestamp(timestamp: number): number {
   return ~~(timestamp / BATCH_DURATION);
 }
 
+function currentBatch(): number {
+  return batchForTimestamp(timestamp());
+}
+
 function timestampForBatch(batch: number): number {
   return batch * BATCH_DURATION;
 }
 
 export function batchDate(batch: number): Date {
   return new Date(timestampForBatch(batch) * 1000);
+}
+
+export function timeRemainingInCurrentBatch(): number {
+  const now = timestamp();
+  const end = timestampForBatch(batchForTimestamp(now) + 1);
+  return end - now;
 }
 
 export function solveTimeRemaining(
@@ -50,7 +60,7 @@ export async function getLatestBatchSolutions(
   count: number,
   filterUnsolvedBatches: boolean,
 ): Promise<BatchSolutions[]> {
-  const solvingBatch = batchForTimestamp(timestamp()) - 1;
+  const solvingBatch = currentBatch() - 1;
   const filter = filterUnsolvedBatches
     ? `first: ${count}`
     : `where: {id_gt: "${solvingBatch - count}"}`;
