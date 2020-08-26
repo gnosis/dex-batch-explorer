@@ -107,7 +107,7 @@ export async function getLatestBatchSolutions(
   } = await response.json();
 
   const batchData: BatchSolutions[] = result.data.batches.map((batch) => ({
-    batch: parseInt(batch.id) - 1,
+    batch: parseInt(batch.id),
     solutions: batch.solutions.map((solution) => ({
       solver: solution.solver.id,
       feeReward: BigInt(solution.feeReward),
