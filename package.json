@@ -1,5 +1,5 @@
 {
-  "name": "dex-solutions",
+  "name": "dex-batch-explorer",
   "version": "0.0.0",
   "license": "GPL-3.0-or-later",
   "private": true,
@@ -23,7 +23,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --passWithNoTests",
-    "bundle": "yarn build && tar -cvzf dex-solutions.tar.gz -C build .",
+    "bundle": "yarn build && tar -cvzf dex-batch-explorer.tar.gz -C build .",
     "prettier": "prettier ."
   },
   "eslintConfig": {

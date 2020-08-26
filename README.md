@@ -15,8 +15,8 @@ A `Dockerfile` is also provided in order to build an image that hosts the static
 page with NGINX on port 80:
 
 ```
-$ docker build -t dex-solutions -f docker/Dockerfile .
+$ docker build -t dex-batch-explorer -f docker/Dockerfile .
 ...
-$ docker run -p 80:80 dex-solutions
+$ docker run -p 80:80 dex-batch-explorer
 $ xdg-open http://localhost:80/
 ```

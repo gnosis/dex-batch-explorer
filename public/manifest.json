@@ -1,6 +1,6 @@
 {
-  "short_name": "Gnosis Protocol Batches",
-  "name": "Gnosis Protocol Batches",
+  "short_name": "Batch Explorer",
+  "name": "Gnosis Protocol Batch Explorer",
   "icons": [
     {
       "src": "favicon.ico",
