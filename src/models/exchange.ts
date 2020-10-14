@@ -47,7 +47,7 @@ export enum Network {
   Xdai = "xdai",
 }
 
-const GP_GRAPH: Record<Network, string | undefined> = {
+const GP_GRAPH: Record<Network, string> = {
   [Network.Mainnet]: "https://api.thegraph.com/subgraphs/name/gnosis/protocol",
   [Network.Rinkeby]:
     "https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby",
@@ -55,7 +55,7 @@ const GP_GRAPH: Record<Network, string | undefined> = {
     "https://api.thegraph.com/subgraphs/name/gnosis/protocol-xdai",
 };
 
-export const TX_EXPLORER: Record<Network, string | undefined> = {
+export const TX_EXPLORER: Record<Network, string> = {
   [Network.Mainnet]: "https://etherscan.io/tx/",
   [Network.Rinkeby]: "https://rinkeby.etherscan.io/tx/",
   [Network.Xdai]: "https://blockscout.com/poa/xdai/tx/",
@@ -85,7 +85,7 @@ export async function getLatestBatchSolutions(
     ? `first: ${count}`
     : `where: {id_gt: "${solvingBatch - count}"}`;
 
-  const response = await fetch(GP_GRAPH[network]!, {
+  const response = await fetch(GP_GRAPH[network], {
     method: "POST",
     body: JSON.stringify({
       query: `{
