@@ -41,10 +41,29 @@ export function solveTimeRemaining(
   return [Math.max(remaining - FINALITY_DURATION, 0), remaining];
 }
 
-const GP_GRAPH = "https://api.thegraph.com/subgraphs/name/gnosis/protocol";
+export enum Network {
+  Mainnet = "mainnet",
+  Rinkeby = "rinkeby",
+  Xdai = "xdai",
+}
+
+const GP_GRAPH: Record<Network, string | undefined> = {
+  [Network.Mainnet]: "https://api.thegraph.com/subgraphs/name/gnosis/protocol",
+  [Network.Rinkeby]:
+    "https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby",
+  [Network.Xdai]:
+    "https://api.thegraph.com/subgraphs/name/gnosis/protocol-xdai",
+};
+
+export const TX_EXPLORER: Record<Network, string | undefined> = {
+  [Network.Mainnet]: "https://etherscan.io/tx/",
+  [Network.Rinkeby]: "https://rinkeby.etherscan.io/tx/",
+  [Network.Xdai]: "https://blockscout.com/poa/xdai/tx/",
+};
 
 export interface BatchSolutions {
   batch: number;
+  network: Network;
   solutions?: Solution[];
 }
 
@@ -59,13 +78,14 @@ export interface Solution {
 export async function getLatestBatchSolutions(
   count: number,
   filterUnsolvedBatches: boolean,
+  network: Network,
 ): Promise<BatchSolutions[]> {
   const solvingBatch = currentBatch() - 1;
   const filter = filterUnsolvedBatches
     ? `first: ${count}`
     : `where: {id_gt: "${solvingBatch - count}"}`;
 
-  const response = await fetch(GP_GRAPH, {
+  const response = await fetch(GP_GRAPH[network]!, {
     method: "POST",
     body: JSON.stringify({
       query: `{
@@ -108,6 +128,7 @@ export async function getLatestBatchSolutions(
 
   const batchData: BatchSolutions[] = result.data.batches.map((batch) => ({
     batch: parseInt(batch.id),
+    network,
     solutions: batch.solutions.map((solution) => ({
       solver: solution.solver.id,
       feeReward: BigInt(solution.feeReward),
@@ -121,6 +142,7 @@ export async function getLatestBatchSolutions(
     const [remaining] = solveTimeRemaining(solvingBatch) || [0, 0];
     batchData.unshift({
       batch: solvingBatch,
+      network,
       solutions: remaining === 0 ? [] : undefined,
     });
   }
@@ -132,6 +154,7 @@ export async function getLatestBatchSolutions(
         return (
           batchData.find((batch) => batch.batch === batchId) || {
             batch: batchId,
+            network,
             solutions: [],
           }
         );

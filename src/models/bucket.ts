@@ -106,6 +106,30 @@ const SOLVERS: Record<string, SolverData | undefined> = {
     name: "Production Best-Ring Solver",
     path: "mainnet_prod/best-ring-solver",
   },
+  "0x122085960fe0124569cb99211e6dfad082a10f92": {
+    name: "Staging Best-Ring Solver (xDAI)",
+    path: "xdai_dev/best-ring-solver",
+  },
+  "0x03e941626aacd9f088a5d24479f22f2e87045cda": {
+    name: "Staging Standard Solver (xDAI)",
+    path: "xdai_dev/standard-solver",
+  },
+  "0x66651c3136f45f5a3f216bdcf794246bdf92163e": {
+    name: "Staging Open Solver (xDAI)",
+    path: "xdai_dev/open-solver",
+  },
+  "0xa800b730ca1270a3db0d23c4643363fe795e2fe6": {
+    name: "Staging Best-Ring Solver (Rinkeby)",
+    path: "rinkeby_dev/best-ring-solver",
+  },
+  "0x3851195b21d672e88bbd45f0da94e1d14b755339": {
+    name: "Staging Standard Solver (Rinkeby)",
+    path: "rinkeby_dev/standard-solver",
+  },
+  "0x8bda84af06bd413f7e47fcbff1b6474b91b41df2": {
+    name: "Staging Open Solver (Rinkeby)",
+    path: "rinkeby_dev/open-solver",
+  },
 };
 
 function getSolverByAddress(solverAddress: string): SolverData | undefined {

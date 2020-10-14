@@ -18,6 +18,7 @@ import {
   BATCH_DURATION,
   BatchSolutions,
   batchDate,
+  TX_EXPLORER,
 } from "../models/exchange";
 import { formatTime, formatTx } from "../utilities/format";
 
@@ -65,7 +66,7 @@ export interface BatchProps {
 
 const LINK_UPDATE_INTERVAL = 5000;
 
-function Batch({ batch, solutions }: BatchSolutions) {
+function Batch({ batch, network, solutions }: BatchSolutions) {
   const classes = useStyles();
   const [link, setLink] = useState(undefined as string | undefined);
   const [solver, setSolver] = useState(undefined as ResultData | undefined);
@@ -114,7 +115,7 @@ function Batch({ batch, solutions }: BatchSolutions) {
           ) : (
             <span>
               Tx{" "}
-              <a href={`https://etherscan.io/tx/${solutions![0].txHash}`}>
+              <a href={`${TX_EXPLORER[network]}${solutions![0].txHash}`}>
                 {formatTx(solutions![0].txHash)}
               </a>
             </span>
