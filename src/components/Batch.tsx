@@ -125,10 +125,10 @@ function Batch({ batch, network, solutions }: BatchSolutions) {
           <LinkButton title="Instance" classes={classes} href={link}>
             <List />
           </LinkButton>
-          <LinkButton title="Result" classes={classes} href={solver?.result}>
+          <LinkButton title="Result" classes={classes} href={solver?.links?.result}>
             <PlaylistAddCheck />
           </LinkButton>
-          <LinkButton title="Graph" classes={classes} href={solver?.graph}>
+          <LinkButton title="Graph" classes={classes} href={solver?.links?.graph}>
             <DonutLarge />
           </LinkButton>
         </Grid>
