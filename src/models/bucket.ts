@@ -13,6 +13,9 @@ function s3Url(bucket: string): string {
 const INSTANCE_CACHE: Record<number, string | undefined> = {};
 let INSTANCE_FIRST_CACHE: Promise<void> | null = null;
 export async function findInstance(batch: number): Promise<string | undefined> {
+  // NOTE: Synchronize the first update of the instance cache. This is done so
+  // that on initial load there aren't multiple requests for listing the
+  // solution instance files on the S3 bucket.
   if (!INSTANCE_FIRST_CACHE) {
     INSTANCE_FIRST_CACHE = updateInstanceCache(batch);
   }
@@ -23,7 +26,7 @@ export async function findInstance(batch: number): Promise<string | undefined> {
     return cached;
   }
 
-  updateInstanceCache(batch);
+  await updateInstanceCache(batch);
 
   return INSTANCE_CACHE[batch];
 }
@@ -48,8 +51,10 @@ async function updateInstanceCache(batch: number): Promise<void> {
 
 export interface ResultData {
   solver: string;
-  result?: string;
-  graph?: string;
+  links?: {
+    result: string;
+    graph: string;
+  };
 }
 
 export async function findResult(
@@ -81,8 +86,10 @@ export async function findResult(
 
   return {
     solver: solverData.name,
-    result: link(bucket, `${resultDir.prefix}06_solution_int_valid.json`),
-    graph: link(bucket, `${resultDir.prefix}solution-graph.html`),
+    links: {
+      result: link(bucket, `${resultDir.prefix}06_solution_int_valid.json`),
+      graph: link(bucket, `${resultDir.prefix}solution-graph.html`),
+    },
   };
 }
 
