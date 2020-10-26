@@ -1,5 +1,5 @@
 import { formatDate } from "../utilities/format";
-import { batchDate } from "./exchange";
+import { batchDate, Network } from "./exchange";
 
 const PARSER = new DOMParser();
 
@@ -10,32 +10,50 @@ function s3Url(bucket: string): string {
   return `https://${bucket}.s3.amazonaws.com`;
 }
 
-const INSTANCE_CACHE: Record<number, string | undefined> = {};
-let INSTANCE_FIRST_CACHE: Promise<void> | null = null;
-export async function findInstance(batch: number): Promise<string | undefined> {
-  // NOTE: Synchronize the first update of the instance cache. This is done so
-  // that on initial load there aren't multiple requests for listing the
-  // solution instance files on the S3 bucket.
-  if (!INSTANCE_FIRST_CACHE) {
-    INSTANCE_FIRST_CACHE = updateInstanceCache(batch);
-  }
-  await INSTANCE_FIRST_CACHE;
+const INSTANCE_CACHE: Record<Network, Record<number, string | undefined>> = {
+  [Network.Mainnet]: {},
+  [Network.Rinkeby]: {},
+  [Network.Xdai]: {},
+};
+const INSTANCE_CACHE_UPDATE: Record<string, Promise<void> | undefined> = {};
 
-  const cached = INSTANCE_CACHE[batch];
+export async function findInstance(
+  network: Network,
+  batch: number,
+): Promise<string | undefined> {
+  const cached = INSTANCE_CACHE[network][batch];
   if (cached) {
     return cached;
   }
 
-  await updateInstanceCache(batch);
-
-  return INSTANCE_CACHE[batch];
-}
-
-async function updateInstanceCache(batch: number): Promise<void> {
+  // NOTE: Always default to using instance files from the staging standard
+  // solver as, currently, they are the same across all solvers.
   const bucket = STAGING_BUCKET;
-  const path = `data/mainnet_dev/standard-solver/instances/${formatDate(
+  const path = `data/${network}_dev/standard-solver/instances/${formatDate(
     batchDate(batch),
   )}/`;
+
+  // NOTE: Synchronize the updates to the instance cache. This is done so that
+  // on initial load there aren't multiple requests for listing the instance
+  // files on the S3 bucket.
+  const updateKey = `${bucket}/${path}`;
+  if (!INSTANCE_CACHE_UPDATE[updateKey]) {
+    INSTANCE_CACHE_UPDATE[updateKey] = updateInstanceCache(
+      bucket,
+      path,
+      network,
+    );
+  }
+  await INSTANCE_CACHE_UPDATE[updateKey];
+
+  return INSTANCE_CACHE[network][batch];
+}
+
+async function updateInstanceCache(
+  bucket: string,
+  path: string,
+  network: Network,
+): Promise<void> {
   const instances = (await ls(bucket, path))
     .map((path) => /instance_(\d+)_/.exec(path))
     .filter((match) => match)
@@ -45,7 +63,7 @@ async function updateInstanceCache(batch: number): Promise<void> {
     }));
 
   for (const { batch, link } of instances) {
-    INSTANCE_CACHE[batch] = link;
+    INSTANCE_CACHE[network][batch] = link;
   }
 }
 
