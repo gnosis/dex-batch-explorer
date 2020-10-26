@@ -34,8 +34,8 @@ export async function findInstance(
   )}/`;
 
   // NOTE: Synchronize the updates to the instance cache. This is done so that
-  // on initial load there aren't multiple requests for listing the solution
-  // instance files on the S3 bucket.
+  // on initial load there aren't multiple requests for listing the instance
+  // files on the S3 bucket.
   const updateKey = `${bucket}/${path}`;
   if (!INSTANCE_CACHE_UPDATE[updateKey]) {
     INSTANCE_CACHE_UPDATE[updateKey] = updateInstanceCache(
