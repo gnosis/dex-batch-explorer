@@ -145,6 +145,21 @@ const SOLVERS: Record<string, SolverData | undefined> = {
     bucket: STAGING_BUCKET,
     path: "xdai_dev/open-solver",
   },
+  "0xe6493dc08f582a0cb9be77e6d071d0ec2789b458": {
+    name: "Production Best-Ring Solver (xDAI)",
+    bucket: PRODUCTION_BUCKET,
+    path: "xdai_prod/best-ring-solver",
+  },
+  "0xc5a631cac2f9c189465b0bb8872a3cbf5ecc8eda": {
+    name: "Production Standard Solver (xDAI)",
+    bucket: PRODUCTION_BUCKET,
+    path: "xdai_prod/standard-solver",
+  },
+  "0x8e5f509b331337f080a220a2f5c98daeda0868ef": {
+    name: "Production Open Solver (xDAI)",
+    bucket: PRODUCTION_BUCKET,
+    path: "xdai_prod/open-solver",
+  },
   "0xa800b730ca1270a3db0d23c4643363fe795e2fe6": {
     name: "Staging Best-Ring Solver (Rinkeby)",
     bucket: STAGING_BUCKET,
