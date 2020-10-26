@@ -73,7 +73,7 @@ function Batch({ batch, network, solutions }: BatchSolutions) {
 
   useEffect(() => {
     const updateLink = async () => {
-      const link = await findInstance(batch);
+      const link = await findInstance(network, batch);
       if (link) {
         setLink(link);
         clearInterval(timer);
@@ -83,7 +83,7 @@ function Batch({ batch, network, solutions }: BatchSolutions) {
     const timer = setInterval(updateLink, LINK_UPDATE_INTERVAL);
     updateLink();
     return () => clearInterval(timer);
-  }, [batch, solutions]);
+  }, [batch, network, solutions]);
 
   const solverAddress = (solutions || [])[0]?.solver;
   useEffect(() => {
@@ -125,10 +125,18 @@ function Batch({ batch, network, solutions }: BatchSolutions) {
           <LinkButton title="Instance" classes={classes} href={link}>
             <List />
           </LinkButton>
-          <LinkButton title="Result" classes={classes} href={solver?.links?.result}>
+          <LinkButton
+            title="Result"
+            classes={classes}
+            href={solver?.links?.result}
+          >
             <PlaylistAddCheck />
           </LinkButton>
-          <LinkButton title="Graph" classes={classes} href={solver?.links?.graph}>
+          <LinkButton
+            title="Graph"
+            classes={classes}
+            href={solver?.links?.graph}
+          >
             <DonutLarge />
           </LinkButton>
         </Grid>
